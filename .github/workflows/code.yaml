@@ -1,0 +1,36 @@
+name: 'code'
+
+on:
+  push:
+    branches:
+    - 'master'
+    paths:
+    - '.github/workflows/code.yaml'
+    - 'package.json'
+    - 'src/**'
+    - 'tests/*'
+    - 'tsconfig.json'
+    - 'tslint.json'
+  pull_request:
+    paths:
+    - '.github/workflows/code.yaml'
+    - 'package.json'
+    - 'src/**'
+    - 'tests/*'
+    - 'tsconfig.json'
+    - 'tslint.json'
+
+jobs:
+  test:
+    name: lint and test
+    runs-on: ubuntu-latest
+    container: minddocdev/node-alpine-ci:latest
+    steps:
+    - name: Checkout git repository
+      uses: actions/checkout@master
+    - name: Install yarn dependencies
+      run: yarn install --frozen-lockfile
+    - name: Lint code
+      run: yarn lint
+    - name: Test code
+      run: yarn test

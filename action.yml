@@ -1,0 +1,64 @@
+name: 'Helm'
+description: 'Helm check and publish'
+author: 'MindDoc GmbH'
+inputs:
+  # Deployment variables
+  app:
+    description: 'The app name to deploy'
+    required: true
+  appUrl:
+    description: 'The deployed app url for visualization purposes'
+    required: false
+  # Helm variables
+  chart:
+    description: 'The helm chart name to use for deployment'
+    required: true
+  helmRepoName:
+    description: 'The helm repository name where the chart belongs to'
+    required: false
+  helmRepoUrl:
+    description: 'The helm repository url'
+    required: false
+  helmRepoUsername:
+    description: 'The helm repository username'
+    required: false
+  helmRepoPassword:
+    description: 'The helm repository password'
+    required: false
+  imageTagKey:
+    description: 'The image tag key that the chart uses as value for docker images'
+    required: false
+    default: 'image.tag'
+  kubeConfig:
+    description: 'The kubectl configuration'
+    required: false
+  namespace:
+    description: 'The kubernetes namespace to deploy to'
+    required: false
+    default: 'default'
+  release:
+    description: 'The helm chart release name to use for deployment'
+    required: false
+  valueFiles:
+    description: 'The helm chart value files to load'
+    required: false
+  # Sentry variables
+  sentryAuthToken:
+    description: 'The sentry client token for authentication'
+    required: false
+  sentryEnvironment:
+    description: 'The sentry environment to deploy to'
+    required: false
+  sentryOrg:
+    description: 'The sentry organization'
+    required: false
+  # Slack variables
+  slackWebhook:
+    description: 'The slack webhook to use to push messages'
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'cloud'
+  color: 'green'
