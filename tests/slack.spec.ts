@@ -4,7 +4,6 @@ import * as sh from 'shelljs';
 import { sendSlackMessage } from '../src/slack';
 
 describe('sentry', () => {
-  const state = 'success';
   const githubRepo = 'fakeRepo';
   const githubRef = 'fakeRef';
   const githubActor = 'fakeActor';
@@ -17,12 +16,12 @@ describe('sentry', () => {
 
   test('set release', () => {
     sendSlackMessage(
-      state, githubRepo, githubRef, githubActor, appName, appUrl,
+      githubRepo, githubRef, githubActor, appName, appUrl,
       commitSha, release, slackWebhook, sentryOrg,
     );
     const expectedPayload = {
       text: oneLine`
-      [<https://github.com/${githubRepo}|${appName}>] [${state}]
+      [<https://github.com/${githubRepo}|${appName}>]
       Deployed <https://github.com/${githubRepo}|${githubRef}> to <${appUrl}|${appUrl}>
     `,
       attachments: [

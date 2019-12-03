@@ -76,22 +76,27 @@ async function run() {
 
     core.info(`Deploy ${app} chart`);
     if (helmRepoName && helmRepoUrl) {
-      addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword);
+      if (addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword).code !== 0) {
+        throw new Error(`Unable to add repository ${helmRepoName} with url ${helmRepoUrl}`);
+      }
     }
-    const code = setupHelmChart(namespace, release, chart, valueFiles).code;
-    const state = code === 0 ? 'success' : 'failure';
 
-    if (state === 'success') {
-      if (sentryAuthToken) {
-        core.info(`Set up sentry release for ${sentryEnvironment}`);
-        setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment);
+    if (setupHelmChart(namespace, release, chart, valueFiles).code !== 0) {
+      throw new Error(`Unable to deploy ${app}`);
+    }
+
+    if (sentryAuthToken) {
+      core.info(`Set up sentry release for ${sentryEnvironment}`);
+      if (setSentryRelease(
+        sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment,
+      ).code !== 0) {
+        throw new Error(`Unable to deploy ${app} release to sentry`);
       }
     }
 
     if (slackWebhook) {
       core.info('Send slack notification');
-      sendSlackMessage(
-        state,
+      if (sendSlackMessage(
         `${context.repo.owner}/${context.repo.repo}`,
         context.ref,
         context.actor,
@@ -101,9 +106,10 @@ async function run() {
         release,
         slackWebhook,
         sentryOrg,
-      );
+      ).code !== 0) {
+        throw new Error('Unable to send Slack notification');
+      }
     }
-
   } catch (error) {
     core.setFailed(error.message);
   }

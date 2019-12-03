@@ -2,7 +2,6 @@ import { oneLine, oneLineTrim } from 'common-tags';
 import { exec } from 'shelljs';
 
 export function sendSlackMessage(
-  state: 'success' | 'failure',
   githubRepo: string,
   githubRef: string,
   githubActor: string,
@@ -15,7 +14,7 @@ export function sendSlackMessage(
 ) {
   const payload = {
     text: oneLine`
-      [<https://github.com/${githubRepo}|${appName}>] [${state}]
+      [<https://github.com/${githubRepo}|${appName}>]
       Deployed <https://github.com/${githubRepo}|${githubRef}> to <${appUrl}|${appUrl}>
     `,
     attachments: [
