@@ -42,6 +42,9 @@ inputs:
   valueFiles:
     description: 'The helm chart value files to load'
     required: false
+  values:
+    description: 'The helm chart values to load in YAML/JSON format'
+    required: false
   # Sentry variables
   sentryAuthToken:
     description: 'The sentry client token for authentication'

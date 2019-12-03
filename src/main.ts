@@ -29,6 +29,13 @@ function getValueFiles(files) {
   return fileList.filter(f => !!f);
 }
 
+function getValues(values) {
+  if (typeof values === 'object') {
+    return JSON.stringify(values);
+  }
+  return values;
+}
+
 async function run() {
   try {
     const context = github.context;
@@ -48,6 +55,7 @@ async function run() {
     const namespace = core.getInput('namespace', { required: false }) || 'default';
     const release = core.getInput('release', { required: false }) || app;
     const valueFiles = getValueFiles(core.getInput('valueFiles', { required: false }));
+    const values = getValues(core.getInput('values'));
     // Sentry variables
     const sentryAuthToken = core.getInput('sentryAuthToken', { required: false });
     const sentryEnvironment = core.getInput('sentryEnvironment', { required: false })
@@ -59,6 +67,13 @@ async function run() {
     // Create kubeconfig file
     process.env.KUBECONFIG = './kubeconfig.yaml';
     await writeFile(process.env.KUBECONFIG, kubeConfig);
+
+    // Create values file from given YAML/JSON (will overwrite file values)
+    if (values) {
+      const loadedValuesPath = './loaded-values.yaml';
+      await writeFile(loadedValuesPath, values);
+      valueFiles.concat([loadedValuesPath]);
+    }
 
     core.info(`Deploy ${app} chart`);
     if (helmRepoName && helmRepoUrl) {
