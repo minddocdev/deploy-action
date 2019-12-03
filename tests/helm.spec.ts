@@ -39,19 +39,11 @@ describe('helm', () => {
       `);
     });
 
-    test('with value fields', () => {
+    test('with value files', () => {
       setupHelmChart(namespace, release, chart, ['values.yaml', 'secrets.yaml']);
       expect(sh.exec).toBeCalledWith(oneLine`
         helm upgrade --install --wait --namespace ${namespace}
         -f values.yaml -f secrets.yaml ${release} ${chart}
-      `);
-    });
-
-    test('with values', () => {
-      setupHelmChart(namespace, release, chart, undefined, ['image.tag=fake']);
-      expect(sh.exec).toBeCalledWith(oneLine`
-        helm upgrade --install --wait --namespace ${namespace}
-        --set image.tag=fake ${release} ${chart}
       `);
     });
   });

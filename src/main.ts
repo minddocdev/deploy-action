@@ -50,7 +50,6 @@ async function run() {
     const helmRepoUrl = core.getInput('helmRepoUrl', { required: false });
     const helmRepoUsername = core.getInput('helmRepoUsername', { required: false });
     const helmRepoPassword = core.getInput('helmRepoPassword', { required: false });
-    const imageTagKey = core.getInput('imageTagKey', { required: false }) || 'image.tag';
     const kubeConfig = core.getInput('kubeConfig', { required: false });
     const namespace = core.getInput('namespace', { required: false }) || 'default';
     const release = core.getInput('release', { required: false }) || app;
@@ -79,9 +78,7 @@ async function run() {
     if (helmRepoName && helmRepoUrl) {
       addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword);
     }
-    const code = setupHelmChart(
-      namespace, release, chart, valueFiles, [`${imageTagKey}=${context.sha}`],
-    ).code;
+    const code = setupHelmChart(namespace, release, chart, valueFiles).code;
     const state = code === 0 ? 'success' : 'failure';
 
     if (state === 'success') {

@@ -25,10 +25,6 @@ inputs:
   helmRepoPassword:
     description: 'The helm repository password'
     required: false
-  imageTagKey:
-    description: 'The image tag key that the chart uses as value for docker images'
-    required: false
-    default: 'image.tag'
   kubeConfig:
     description: 'The kubectl configuration'
     required: false

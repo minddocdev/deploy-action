@@ -11,7 +11,6 @@ export function setupHelmChart(
   release: string,
   chart: string,
   valueFiles: string[] = [],
-  values?: string[],
 ) {
   const valueFilesString = valueFiles
     .map(valueFile => `-f ${valueFile}`)
@@ -23,7 +22,6 @@ export function setupHelmChart(
       --wait
       --namespace ${namespace}
       ${valueFilesString}
-      ${values ? `--set ${values.join(',')}` : ''}
       ${release}
       ${chart}
   `);
