@@ -60,7 +60,7 @@ async function run() {
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
       await createHelmValuesFile(loadedValuesPath, values);
-      valueFiles.concat([loadedValuesPath]);
+      valueFiles.push(loadedValuesPath);
     } else {
       core.info('No values were provided. Skipping extra value file creation');
     }
