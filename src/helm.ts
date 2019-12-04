@@ -3,6 +3,7 @@ import { exec } from 'shelljs';
 import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as util from 'util';
+import * as yaml from 'js-yaml';
 
 const writeFile = util.promisify(fs.writeFile);
 
@@ -11,11 +12,17 @@ export function parseValueFiles(files: string | string[]) {
   let fileList: string[];
   if (typeof files === 'string') {
     try {
+      // Try JSON first
       fileList = JSON.parse(files);
       core.info(`Parsed value files: ${fileList}`);
     } catch (err) {
-      fileList = [files];
-      core.warning(`Parsed value files as single string: ${fileList}`);
+      // Might be in YAML format
+      try {
+        fileList = yaml.safeLoad(files);
+      } catch (err) {
+        fileList = [files];
+        core.warning(`Parsed value files as single string: ${fileList}`);
+      }
     }
   } else {
     fileList = files;

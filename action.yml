@@ -36,10 +36,10 @@ inputs:
     description: 'The helm chart release name to use for deployment'
     required: false
   valueFiles:
-    description: 'The helm chart value files to load'
+    description: 'The helm chart value files to load (YAML/JSON format string)'
     required: false
   values:
-    description: 'The helm chart values to load in YAML/JSON format'
+    description: 'The helm chart values to load (YAML/JSON format string)'
     required: false
   # Sentry variables
   sentryAuthToken:

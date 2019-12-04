@@ -24,6 +24,14 @@ describe('helm', () => {
       expect(parseValueFiles('{"files": ["file1", "file2"]}')).toStrictEqual([]);
     });
 
+    test('from a valid YAML list', () => {
+      expect(parseValueFiles('- "file1"\n- "file2"\n')).toStrictEqual(['file1', 'file2']);
+    });
+
+    test('gives empty list when YAML string is not a list', () => {
+      expect(parseValueFiles('config:\n  key: value\n')).toStrictEqual([]);
+    });
+
     test('does nothing when list is already provided', () => {
       const files = ['file1', 'file2'];
       expect(parseValueFiles(files)).toStrictEqual(files);
