@@ -7,6 +7,7 @@ import {
 } from './helm';
 import { setSentryRelease } from './sentry';
 import { sendSlackMessage } from './slack';
+import { Cipher } from 'crypto';
 
 type Environment = 'production' | 'staging' | 'qa';
 
@@ -28,7 +29,7 @@ async function run() {
     const namespace = core.getInput('namespace', { required: false }) || 'default';
     const release = core.getInput('release', { required: false }) || app;
     const valueFiles = parseValueFiles(core.getInput('valueFiles', { required: false }));
-    const values = core.getInput('values');
+    const values = core.getInput('values', { required: false });
     // Sentry variables
     const sentryAuthToken = core.getInput('sentryAuthToken', { required: false });
     const sentryEnvironment = core.getInput('sentryEnvironment', { required: false })
@@ -60,15 +61,21 @@ async function run() {
       const loadedValuesPath = './loaded-values.yaml';
       createHelmValuesFile(loadedValuesPath, values);
       valueFiles.concat([loadedValuesPath]);
+    } else {
+      core.info('No values were provided. Skipping extra value file creation');
     }
     if (helmRepoName && helmRepoUrl) {
       addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword);
+    } else {
+      core.info('No repo was provided. Skipping repo addition');
     }
     setupHelmChart(namespace, release, chart, valueFiles);
 
     // Deploy to Sentry
     if (sentryAuthToken) {
       setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment);
+    } else {
+      core.info('No sentry auth token was provided. Skipping sentry release')
     }
 
     // Send Slack notification
@@ -84,6 +91,8 @@ async function run() {
         slackWebhook,
         sentryOrg,
       );
+    } else {
+      core.info('No slack webhook was provided. Skipping slack message notification');
     }
   } catch (error) {
     core.setFailed(error.message);

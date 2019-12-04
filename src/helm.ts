@@ -45,8 +45,10 @@ export async function createHelmValuesFile(path: string, values: string | {}) {
   core.debug(`Parsing values '${values}'...`);
   let parsedValues: string;
   if (typeof values === 'object') {
+    // Parse to JSON so helm can read it
     parsedValues = JSON.stringify(values);
   } else {
+    // It is either YAML or JSON (helm will read it directly)
     parsedValues = values as string;
   }
   await writeFile(path, parsedValues);
