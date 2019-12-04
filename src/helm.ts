@@ -7,6 +7,7 @@ import * as util from 'util';
 const writeFile = util.promisify(fs.writeFile);
 
 export function parseValueFiles(files: string | string[]) {
+  core.debug(`Parsing files '${files}'...`);
   let fileList: string[];
   if (typeof files === 'string') {
     try {
@@ -30,9 +31,11 @@ export function parseValueFiles(files: string | string[]) {
 export async function createKubeConfig(kubeConfig: string) {
   process.env.KUBECONFIG = './kubeconfig.yaml';
   await writeFile(process.env.KUBECONFIG, kubeConfig);
+  core.info(`Created kubernetes config in ${process.env.KUBECONFIG}`);
 }
 
 export async function createHelmValuesFile(path: string, values: string | {}) {
+  core.debug(`Parsing values '${values}'...`);
   let parsedValues: string;
   if (typeof values === 'object') {
     parsedValues = JSON.stringify(values);
@@ -40,6 +43,7 @@ export async function createHelmValuesFile(path: string, values: string | {}) {
     parsedValues = values as string;
   }
   await writeFile(path, parsedValues);
+  core.info(`Created values file from provided values in ${path}`);
 }
 
 export function addHelmRepo(name: string, url: string, username?: string, password?: string) {

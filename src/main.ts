@@ -37,6 +37,23 @@ async function run() {
     // Slack variables
     const slackWebhook = core.getInput('slackWebhook', { required: false });
 
+    core.debug('Loaded variables:');
+    core.debug(`- app: ${app}`);
+    core.debug(`- appUrl: ${appUrl}`);
+    core.debug(`- environment: ${environment}`);
+    core.debug(`- helmRepoName: ${helmRepoName}`);
+    core.debug(`- helmRepoUsername: ${helmRepoUsername}`);
+    core.debug(`- helmRepoPassword: ${helmRepoPassword}`);
+    core.debug(`- kubeConfig: ${kubeConfig}`);
+    core.debug(`- namespace: ${namespace}`);
+    core.debug(`- release: ${release}`);
+    core.debug(`- valueFiles: ${valueFiles}`);
+    core.debug(`- values: ${values}`);
+    core.debug(`- sentryAuthToken: ${sentryAuthToken}`);
+    core.debug(`- sentryEnvironment: ${sentryEnvironment}`);
+    core.debug(`- sentryOrg: ${sentryOrg}`);
+    core.debug(`- slackWebhook: ${slackWebhook}`);
+
     // Deploy to Kubernetes
     await createKubeConfig(kubeConfig);
     if (values) {
