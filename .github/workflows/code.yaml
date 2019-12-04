@@ -27,7 +27,7 @@ jobs:
     container: minddocdev/node-alpine-ci:latest
     steps:
     - name: Checkout git repository
-      uses: actions/checkout@master
+      uses: actions/checkout@v1.2.0
     - name: Install yarn dependencies
       run: yarn install --frozen-lockfile
     - name: Lint code
