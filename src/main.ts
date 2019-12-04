@@ -1,40 +1,14 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as fs from 'fs';
-import * as util from 'util';
 
-import { setupHelmChart, addHelmRepo } from './helm';
+import {
+  createKubeConfig, parseValueFiles,
+  setupHelmChart, addHelmRepo, createHelmValuesFile,
+} from './helm';
 import { setSentryRelease } from './sentry';
 import { sendSlackMessage } from './slack';
 
 type Environment = 'production' | 'staging' | 'qa';
-
-const writeFile = util.promisify(fs.writeFile);
-
-function getValueFiles(files) {
-  let fileList: string[];
-  if (typeof files === 'string') {
-    try {
-      fileList = JSON.parse(files);
-    } catch (err) {
-      // Assume it's a single string.
-      fileList = [files];
-    }
-  } else {
-    fileList = files;
-  }
-  if (!Array.isArray(fileList)) {
-    return [];
-  }
-  return fileList.filter(f => !!f);
-}
-
-function getValues(values) {
-  if (typeof values === 'object') {
-    return JSON.stringify(values);
-  }
-  return values;
-}
 
 async function run() {
   try {
@@ -53,8 +27,8 @@ async function run() {
     const kubeConfig = core.getInput('kubeConfig', { required: false });
     const namespace = core.getInput('namespace', { required: false }) || 'default';
     const release = core.getInput('release', { required: false }) || app;
-    const valueFiles = getValueFiles(core.getInput('valueFiles', { required: false }));
-    const values = getValues(core.getInput('values'));
+    const valueFiles = parseValueFiles(core.getInput('valueFiles', { required: false }));
+    const values = core.getInput('values');
     // Sentry variables
     const sentryAuthToken = core.getInput('sentryAuthToken', { required: false });
     const sentryEnvironment = core.getInput('sentryEnvironment', { required: false })
@@ -63,40 +37,26 @@ async function run() {
     // Slack variables
     const slackWebhook = core.getInput('slackWebhook', { required: false });
 
-    // Create kubeconfig file
-    process.env.KUBECONFIG = './kubeconfig.yaml';
-    await writeFile(process.env.KUBECONFIG, kubeConfig);
-
-    // Create values file from given YAML/JSON (will overwrite file values)
+    // Deploy to Kubernetes
+    await createKubeConfig(kubeConfig);
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
-      await writeFile(loadedValuesPath, values);
+      createHelmValuesFile(loadedValuesPath, values);
       valueFiles.concat([loadedValuesPath]);
     }
-
-    core.info(`Deploy ${app} chart`);
     if (helmRepoName && helmRepoUrl) {
-      if (addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword).code !== 0) {
-        throw new Error(`Unable to add repository ${helmRepoName} with url ${helmRepoUrl}`);
-      }
+      addHelmRepo(helmRepoName, helmRepoUrl, helmRepoUsername, helmRepoPassword);
     }
+    setupHelmChart(namespace, release, chart, valueFiles);
 
-    if (setupHelmChart(namespace, release, chart, valueFiles).code !== 0) {
-      throw new Error(`Unable to deploy ${app}`);
-    }
-
+    // Deploy to Sentry
     if (sentryAuthToken) {
-      core.info(`Set up sentry release for ${sentryEnvironment}`);
-      if (setSentryRelease(
-        sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment,
-      ).code !== 0) {
-        throw new Error(`Unable to deploy ${app} release to sentry`);
-      }
+      setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment);
     }
 
+    // Send Slack notification
     if (slackWebhook) {
-      core.info('Send slack notification');
-      if (sendSlackMessage(
+      sendSlackMessage(
         `${context.repo.owner}/${context.repo.repo}`,
         context.ref,
         context.actor,
@@ -106,9 +66,7 @@ async function run() {
         release,
         slackWebhook,
         sentryOrg,
-      ).code !== 0) {
-        throw new Error('Unable to send Slack notification');
-      }
+      );
     }
   } catch (error) {
     core.setFailed(error.message);

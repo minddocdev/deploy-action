@@ -3,6 +3,8 @@ import * as sh from 'shelljs';
 
 import { sendSlackMessage } from '../src/slack';
 
+jest.mock('@actions/core');
+
 describe('sentry', () => {
   const githubRepo = 'fakeRepo';
   const githubRef = 'fakeRef';

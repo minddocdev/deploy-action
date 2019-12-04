@@ -1,5 +1,6 @@
 import { oneLine, oneLineTrim } from 'common-tags';
 import { exec } from 'shelljs';
+import * as core from '@actions/core';
 
 export function sendSlackMessage(
   githubRepo: string,
@@ -12,6 +13,7 @@ export function sendSlackMessage(
   slackWebhook: string,
   sentryOrg?: string,
 ) {
+  core.info('Send slack notification');
   const payload = {
     text: oneLine`
       [<https://github.com/${githubRepo}|${appName}>]
@@ -68,7 +70,9 @@ export function sendSlackMessage(
       },
     ],
   };
-  return exec(oneLine`
+  if (exec(oneLine`
     curl -s -H "Content-type: application/json" -d "${JSON.stringify(payload)}" ${slackWebhook}
-  `);
+  `).code !== 0) {
+    throw new Error('Unable to send Slack notification');
+  }
 }

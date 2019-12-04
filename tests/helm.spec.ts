@@ -1,9 +1,66 @@
 import { oneLine } from 'common-tags';
 import * as sh from 'shelljs';
+import * as fs from 'fs';
 
-import { addHelmRepo, setupHelmChart } from '../src/helm';
+import {
+  addHelmRepo, createKubeConfig, setupHelmChart,
+  createHelmValuesFile, parseValueFiles,
+} from '../src/helm';
+
+jest.mock('fs', () => ({
+  writeFile: jest.fn(),
+}));
+
+jest.mock('@actions/core');
 
 describe('helm', () => {
+
+  describe('parse values file', () => {
+    test('from a valid JSON string list', () => {
+      expect(parseValueFiles('["file1", "file2"]')).toStrictEqual(['file1', 'file2']);
+    });
+
+    test('gives empty list when JSON string is not a list', () => {
+      expect(parseValueFiles('{"files": ["file1", "file2"]}')).toStrictEqual([]);
+    });
+
+    test('does nothing when list is already provided', () => {
+      const files = ['file1', 'file2'];
+      expect(parseValueFiles(files)).toStrictEqual(files);
+    });
+
+    test('filters empty values', () => {
+      expect(parseValueFiles('["file1", ""]')).toStrictEqual(['file1']);
+    });
+  });
+
+  test('create kube config', () => {
+    const myConfig = oneLine`
+    clusters:
+      - fake
+    `;
+    createKubeConfig(myConfig);
+    expect(fs.writeFile).toBeCalledWith('./kubeconfig.yaml', myConfig, expect.any(Function));
+  });
+
+  describe('create helm values file', () => {
+    const path = 'fakepath.yaml';
+
+    test('with YAML format', () => {
+      const values = oneLine`
+        config:
+          fakeEntry: lol
+      `;
+      createHelmValuesFile(path, values);
+      expect(fs.writeFile).toBeCalledWith(path, values, expect.any(Function));
+    });
+
+    test('with object format', () => {
+      const values = { config: { fakeEntry: 'lol' } };
+      createHelmValuesFile(path, values);
+      expect(fs.writeFile).toBeCalledWith(path, JSON.stringify(values), expect.any(Function));
+    });
+  });
 
   test('repo add with username and password', () => {
     const name = 'fakeRepo';

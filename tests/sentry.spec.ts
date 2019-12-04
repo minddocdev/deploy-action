@@ -1,7 +1,8 @@
-import { oneLine } from 'common-tags';
 import * as sh from 'shelljs';
 
 import { setSentryRelease } from '../src/sentry';
+
+jest.mock('@actions/core');
 
 describe('sentry', () => {
   const authToken = 'fakeToken';
