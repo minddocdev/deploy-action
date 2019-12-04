@@ -59,7 +59,7 @@ async function run() {
     await createKubeConfig(kubeConfig);
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
-      createHelmValuesFile(loadedValuesPath, values);
+      await createHelmValuesFile(loadedValuesPath, values);
       valueFiles.concat([loadedValuesPath]);
     } else {
       core.info('No values were provided. Skipping extra value file creation');
