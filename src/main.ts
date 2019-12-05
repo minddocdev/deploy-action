@@ -1,10 +1,10 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as yaml from 'js-yaml';
+import { exec } from 'shelljs';
 
 import {
-  createKubeConfig, parseValueFiles,
-  setupHelmChart, addHelmRepo, createHelmValuesFile,
+  createKubeConfig, setupHelmChart, addHelmRepo, createHelmValuesFile,
 } from './helm';
 import { setSentryRelease } from './sentry';
 import { sendSlackMessage } from './slack';
@@ -127,6 +127,10 @@ async function run() {
 
     // Deploy to Kubernetes
     await createKubeConfig(kubeConfig);
+    if (process.env.ACTIONS_STEP_DEBUG) {
+      core.debug('Configured cluster information');
+      exec('kubectl cluster-info');
+    }
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
       await createHelmValuesFile(loadedValuesPath, values);
@@ -145,7 +149,7 @@ async function run() {
     if (sentryAuthToken) {
       setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment);
     } else {
-      core.info('No sentry auth token was provided. Skipping sentry release')
+      core.info('No sentry auth token was provided. Skipping sentry release');
     }
 
     // Send Slack notification
