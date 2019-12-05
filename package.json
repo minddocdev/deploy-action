@@ -1,8 +1,8 @@
 {
-  "name": "helm-action",
+  "name": "deploy-action",
   "version": "0.0.0",
   "private": true,
-  "description": "Helm action",
+  "description": "Deploy action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/minddocdev/helm-action.git"
+    "url": "git+https://github.com/minddocdev/deploy-action.git"
   },
   "keywords": [
     "actions",

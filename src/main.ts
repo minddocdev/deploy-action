@@ -7,7 +7,6 @@ import {
 } from './helm';
 import { setSentryRelease } from './sentry';
 import { sendSlackMessage } from './slack';
-import { Cipher } from 'crypto';
 
 type Environment = 'production' | 'staging' | 'qa';
 
