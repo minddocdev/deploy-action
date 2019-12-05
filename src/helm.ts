@@ -57,10 +57,15 @@ export async function createHelmValuesFile(path: string, values: string | {}) {
 
 export function addHelmRepo(name: string, url: string, username?: string, password?: string) {
   const loginString = username && password ? `--username ${username} --password ${password} ` : '';
-  const command = `helm repo add ${loginString}${name} ${url}`;
-  core.info(command);
-  if (exec(command).code !== 0) {
+  const addCommand = `helm repo add ${loginString}${name} ${url}`;
+  core.info(addCommand);
+  if (exec(addCommand).code !== 0) {
     throw new Error(`Unable to add repository ${name} with url ${url}`);
+  }
+  const updateCommand = 'helm repo update';
+  core.info(updateCommand);
+  if (exec(updateCommand).code !== 0) {
+    throw new Error('Unable to update repositories');
   }
 }
 

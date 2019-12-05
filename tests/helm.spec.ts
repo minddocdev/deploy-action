@@ -83,6 +83,7 @@ describe('helm', () => {
         ${name}
         ${url}
     `);
+    expect(sh.exec).toBeCalledWith('helm repo update');
   });
 
   test('repo add without username and password', () => {
@@ -90,6 +91,7 @@ describe('helm', () => {
     const url = 'https://fakeRepo';
     addHelmRepo(name, url);
     expect(sh.exec).toBeCalledWith(`helm repo add ${name} ${url}`);
+    expect(sh.exec).toBeCalledWith('helm repo update');
   });
 
   describe('upgrade', () => {
