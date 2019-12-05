@@ -22,9 +22,8 @@ on:
 
 jobs:
   test:
-    name: lint and test
+    name: lint, test and build
     runs-on: ubuntu-latest
-    container: minddocdev/node-alpine-ci:latest
     steps:
     - name: Checkout git repository
       uses: actions/checkout@v1.2.0

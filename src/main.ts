@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import * as yaml from 'js-yaml';
 
 import {
   createKubeConfig, parseValueFiles,
@@ -7,28 +8,98 @@ import {
 } from './helm';
 import { setSentryRelease } from './sentry';
 import { sendSlackMessage } from './slack';
+import { oneLine } from 'common-tags';
+
+interface RequiredConfig {
+  app: string;
+  appUrl: string;
+  chart: string;
+}
+interface OptionalConfig extends RequiredConfig{
+  namespace?: string;
+  release?: string;
+  valueFiles?: string[];
+  values?: {};
+}
+interface Config extends RequiredConfig {
+  namespace: string;
+  release: string;
+  valueFiles: string[];
+  values: {};
+}
 
 type Environment = 'production' | 'staging' | 'qa';
+
+function getConfig(): Config {
+  const rawConfig = core.getInput('config', { required: true });
+  core.debug(`Parsing raw config '${rawConfig}'...`);
+  let config: OptionalConfig;
+  try {
+    // Try JSON first
+    config = JSON.parse(rawConfig);
+    core.info(`Parsed config: ${config}`);
+  } catch (err) {
+    // Might be in YAML format
+    try {
+      config = yaml.safeLoad(rawConfig);
+    } catch (err) {
+      throw new Error(`Unable to parse config. Found content: ${rawConfig}`);
+    }
+  }
+  // Check loaded types
+  ['app', 'appUrl', 'chart'].forEach((requiredKey) => {
+    const requiredValue = config[requiredKey];
+    if (!requiredValue || typeof requiredValue !== 'string') {
+      throw new Error(oneLine`
+        Invalid config value for mandatory key ${requiredKey}.
+        Found ${requiredValue} while expecting a string
+      `);
+    }
+  });
+  ['namespace', 'release'].forEach((optionalKey) => {
+    if (config[optionalKey] && typeof config[optionalKey] !== 'string') {
+      throw new Error(oneLine`
+        Expecting string in '${optionalKey}' optional key.
+        Found ${config[optionalKey]}
+      `);
+    }
+  });
+  if (config['valueFiles'] && !Array.isArray(config['valueFiles'])) {
+    throw new Error(oneLine`
+      Expecting array in 'valueFiles' optional key.
+      Found ${config['valueFiles']}
+    `);
+  }
+  if (config['values'] && !config['values'] === Object(config['values'])) {
+    throw new Error(oneLine`
+      Expecting object in 'values' optional key.
+      Found ${config['values']}
+    `);
+  }
+  return {
+    namespace: 'default',
+    release: config.app,
+    valueFiles: [],
+    values: {},
+    ...config,
+  };
+}
 
 async function run() {
   try {
     const context = github.context;
 
     // Deployment variables
-    const app = core.getInput('app', { required: true });
-    const appUrl = core.getInput('appUrl', { required: true });
+    const config = getConfig();
+    const { app, appUrl, chart, namespace, release, valueFiles, values } = config;
+
     const environment = core.getInput('environment', { required: true }) as Environment;
     // Helm variables
-    const chart = core.getInput('chart', { required: true });
     const helmRepoName = core.getInput('helmRepoName', { required: false });
     const helmRepoUrl = core.getInput('helmRepoUrl', { required: false });
     const helmRepoUsername = core.getInput('helmRepoUsername', { required: false });
     const helmRepoPassword = core.getInput('helmRepoPassword', { required: false });
     const kubeConfig = core.getInput('kubeConfig', { required: false });
-    const namespace = core.getInput('namespace', { required: false }) || 'default';
-    const release = core.getInput('release', { required: false }) || app;
-    const valueFiles = parseValueFiles(core.getInput('valueFiles', { required: false }));
-    const values = core.getInput('values', { required: false });
     // Sentry variables
     const sentryAuthToken = core.getInput('sentryAuthToken', { required: false });
     const sentryEnvironment = core.getInput('sentryEnvironment', { required: false })

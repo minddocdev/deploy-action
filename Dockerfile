@@ -16,10 +16,10 @@ LABEL maintainer="MindDoc Health GmbH"
 
 RUN apk add --no-cache nodejs npm
 
-COPY lib/ /usr/src/
 COPY package.json /usr/src
+COPY node_modules/ /usr/src/
+COPY lib/ /usr/src/
 
 WORKDIR /usr/src
-RUN npm install --only=prod
 
 ENTRYPOINT ["node", "/usr/src/main.js"]
