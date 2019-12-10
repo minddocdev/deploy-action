@@ -11,7 +11,7 @@ export function setSentryRelease(
   if (exec(newReleaseCommand).code !== 0) {
     throw new Error(`Unable to prepare ${appName} sentry release`);
   }
-  const setCommitsCommand = `${sentryCliReleases} set -commits--auto ${commitSha}`;
+  const setCommitsCommand = `${sentryCliReleases} set-commits --auto ${commitSha}`;
   core.info(setCommitsCommand);
   if (exec(setCommitsCommand).code !== 0) {
     throw new Error(`Unable set commits for ${appName} sentry release`);

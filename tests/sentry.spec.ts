@@ -17,7 +17,7 @@ describe('sentry', () => {
     expect(sh.exec)
       .toBeCalledWith(`${sentryCliReleases} new -p ${appName} ${commitSha}`);
     expect(sh.exec)
-      .toBeCalledWith(`${sentryCliReleases} set -commits--auto ${commitSha}`);
+      .toBeCalledWith(`${sentryCliReleases} set-commits --auto ${commitSha}`);
     expect(sh.exec)
       .toBeCalledWith(`${sentryCliReleases} deploys ${commitSha} new -e ${environment}`);
   });
