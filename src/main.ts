@@ -37,7 +37,7 @@ function getConfig(): Config {
   try {
     // Try JSON first
     config = JSON.parse(rawConfig);
-    core.info(`Parsed config: ${config}`);
+    core.debug(`Loaded config: ${rawConfig}`);
   } catch (err) {
     // Might be in YAML format
     try {
