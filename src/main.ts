@@ -28,8 +28,6 @@ interface Config extends RequiredConfig {
   values: {};
 }
 
-type Environment = 'production' | 'staging' | 'qa';
-
 function getConfig(): Config {
   const rawConfig = core.getInput('config', { required: true });
   core.debug(`Parsing raw config '${rawConfig}'...`);
@@ -92,8 +90,8 @@ async function run() {
     // Deployment variables
     const config = getConfig();
     const { app, appUrl, chart, namespace, release, valueFiles, values } = config;
+    const environment = core.getInput('environment', { required: true });
 
-    const environment = core.getInput('environment', { required: true }) as Environment;
     // Helm variables
     const helmRepoName = core.getInput('helmRepoName', { required: false });
     const helmRepoUrl = core.getInput('helmRepoUrl', { required: false });
@@ -102,8 +100,6 @@ async function run() {
     const kubeConfig = core.getInput('kubeConfig', { required: false });
     // Sentry variables
     const sentryAuthToken = core.getInput('sentryAuthToken', { required: false });
-    const sentryEnvironment = core.getInput('sentryEnvironment', { required: false })
-      || environment;
     const sentryOrg = core.getInput('sentryOrg', { required: false });
     // Slack variables
     const slackWebhook = core.getInput('slackWebhook', { required: false });
@@ -121,7 +117,6 @@ async function run() {
     core.debug(`- valueFiles: ${valueFiles}`);
     core.debug(`- values: ${values}`);
     core.debug(`- sentryAuthToken: ${sentryAuthToken}`);
-    core.debug(`- sentryEnvironment: ${sentryEnvironment}`);
     core.debug(`- sentryOrg: ${sentryOrg}`);
     core.debug(`- slackWebhook: ${slackWebhook}`);
 
@@ -147,7 +142,7 @@ async function run() {
 
     // Deploy to Sentry
     if (sentryAuthToken) {
-      setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, sentryEnvironment);
+      setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, environment);
     } else {
       core.info('No sentry auth token was provided. Skipping sentry release');
     }
