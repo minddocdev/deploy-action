@@ -148,21 +148,21 @@ async function run() {
     }
 
     // Send Slack notification
-    if (slackWebhook) {
-      sendSlackMessage(
-        `${context.repo.owner}/${context.repo.repo}`,
-        context.ref,
-        context.actor,
-        app,
-        appUrl,
-        context.sha,
-        release,
-        slackWebhook,
-        sentryOrg,
-      );
-    } else {
-      core.info('No slack webhook was provided. Skipping slack message notification');
-    }
+    // if (slackWebhook) {
+    //   sendSlackMessage(
+    //     `${context.repo.owner}/${context.repo.repo}`,
+    //     context.ref,
+    //     context.actor,
+    //     app,
+    //     appUrl,
+    //     context.sha,
+    //     release,
+    //     slackWebhook,
+    //     sentryOrg,
+    //   );
+    // } else {
+    //   core.info('No slack webhook was provided. Skipping slack message notification');
+    // }
   } catch (error) {
     core.setFailed(error.message);
   }
