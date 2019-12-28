@@ -124,7 +124,6 @@ async function run() {
     await createKubeConfig(kubeConfig);
 
     core.startGroup('Configured cluster information');
-    exec('kubectl config view');
     exec('kubectl cluster-info');
     exec(`kubectl get all -n ${namespace}`);
     core.endGroup();
