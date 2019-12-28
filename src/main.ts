@@ -125,6 +125,7 @@ async function run() {
     if (process.env.ACTIONS_STEP_DEBUG) {
       core.debug('Configured cluster information');
       exec('kubectl cluster-info');
+      exec(`kubectl get all -n ${namespace}`);
     }
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
