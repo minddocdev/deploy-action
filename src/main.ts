@@ -123,8 +123,8 @@ async function run() {
     // Deploy to Kubernetes
     await createKubeConfig(kubeConfig);
 
-    core.startGroup('Configured cluster information');
-    exec('kubectl cluster-info');
+    core.startGroup('Configured namespace information');
+    exec(`helm ls -n ${namespace}`);
     exec(`kubectl get all -n ${namespace}`);
     core.endGroup();
 
