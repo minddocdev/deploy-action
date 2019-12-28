@@ -56,6 +56,7 @@ export async function createHelmValuesFile(path: string, values: string | {}) {
 }
 
 export function addHelmRepo(name: string, url: string, username?: string, password?: string) {
+  core.startGroup('Add helm repository');
   const loginString = username && password ? `--username ${username} --password ${password} ` : '';
   const addCommand = `helm repo add ${loginString}${name} ${url}`;
   core.info(addCommand);
@@ -67,6 +68,7 @@ export function addHelmRepo(name: string, url: string, username?: string, passwo
   if (exec(updateCommand).code !== 0) {
     throw new Error('Unable to update repositories');
   }
+  core.endGroup();
 }
 
 export function setupHelmChart(
@@ -75,7 +77,7 @@ export function setupHelmChart(
   chart: string,
   valueFiles: string[] = [],
 ) {
-  core.info(`Deploy ${chart} chart with release ${release}`);
+  core.startGroup(`Deploy ${chart} chart with release ${release}`);
   const valueFilesString = valueFiles
     .map(valueFile => `-f ${valueFile}`)
     .join(' ');
@@ -92,4 +94,5 @@ export function setupHelmChart(
   if (exec(command).code !== 0) {
     throw new Error(`Unable to deploy ${chart} chart with release ${release}`);
   }
+  core.endGroup();
 }

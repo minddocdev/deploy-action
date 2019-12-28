@@ -122,11 +122,12 @@ async function run() {
 
     // Deploy to Kubernetes
     await createKubeConfig(kubeConfig);
-    if (process.env.ACTIONS_STEP_DEBUG) {
-      core.debug('Configured cluster information');
-      exec('kubectl cluster-info');
-      exec(`kubectl get all -n ${namespace}`);
-    }
+
+    core.startGroup('Configured cluster information');
+    exec('kubectl cluster-info');
+    exec(`kubectl get all -n ${namespace}`);
+    core.endGroup();
+
     if (values) {
       const loadedValuesPath = './loaded-values.yaml';
       await createHelmValuesFile(loadedValuesPath, values);
@@ -139,6 +140,7 @@ async function run() {
     } else {
       core.info('No repo was provided. Skipping repo addition');
     }
+
     setupHelmChart(namespace, release, chart, valueFiles);
 
     // Deploy to Sentry
