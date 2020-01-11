@@ -5,7 +5,7 @@
   "description": "Deploy action",
   "main": "src/index.ts",
   "scripts": {
-    "build": "ncc build -o lib",
+    "build": "tsc -b -v",
     "lint": "tslint --project .",
     "test": "jest --runInBand"
   },
@@ -33,7 +33,6 @@
     "@types/js-yaml": "^3.12.1",
     "@types/node": "^12.12.14",
     "@types/shelljs": "^0.8.6",
-    "@zeit/ncc": "^0.21.0",
     "husky": "^4.0.3",
     "jest": "^24.8.0",
     "jest-circus": "^24.7.1",
