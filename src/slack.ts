@@ -1,6 +1,6 @@
+import * as core from '@actions/core';
 import { oneLine, oneLineTrim } from 'common-tags';
 import { exec } from 'shelljs';
-import * as core from '@actions/core';
 
 export function sendSlackMessage(
   githubRepo: string,
@@ -29,7 +29,7 @@ export function sendSlackMessage(
               type: 'mrkdown',
               text: oneLine`
                 Release ${sentryOrg ?
-                `<https://sentry.io/organizations/${sentryOrg}/releases/${commitSha}|${release}>` :
+                  `<https://sentry.io/organizations/${sentryOrg}/releases/${commitSha}|${release}>` :
                   release
                 }
               `,

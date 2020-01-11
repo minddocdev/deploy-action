@@ -7,7 +7,6 @@ import {
   createKubeConfig, setupHelmChart, addHelmRepo, createHelmValuesFile,
 } from './helm';
 import { setSentryRelease } from './sentry';
-import { sendSlackMessage } from './slack';
 import { oneLine } from 'common-tags';
 
 interface RequiredConfig {
@@ -15,7 +14,7 @@ interface RequiredConfig {
   appUrl: string;
   chart: string;
 }
-interface OptionalConfig extends RequiredConfig{
+interface OptionalConfig extends RequiredConfig {
   namespace?: string;
   release?: string;
   valueFiles?: string[];
