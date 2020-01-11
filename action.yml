@@ -40,5 +40,5 @@ inputs:
     description: "The slack webhook to use to push messages"
     required: false
 runs:
-  using: "node12"
-  main: "lib/index.js"
+  using: "docker"
+  image: "Dockerfile"
