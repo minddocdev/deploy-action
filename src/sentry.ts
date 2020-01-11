@@ -1,5 +1,5 @@
-import { exec } from 'shelljs';
 import * as core from '@actions/core';
+import { exec } from 'shelljs';
 
 export function setSentryRelease(
   authToken: string, org: string, appName: string, commitSha: string, environment: string,

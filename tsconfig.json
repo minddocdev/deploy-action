@@ -8,8 +8,5 @@
     "noImplicitAny": false,
     "esModuleInterop": true
   },
-  "exclude": [
-    "node_modules",
-    "**/tests/*.ts"
-  ]
+  "exclude": ["node_modules", "**/tests/*.ts"]
 }

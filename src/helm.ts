@@ -1,9 +1,9 @@
-import { oneLine } from 'common-tags';
-import { exec } from 'shelljs';
 import * as core from '@actions/core';
+import { oneLine } from 'common-tags';
 import * as fs from 'fs';
-import * as util from 'util';
 import * as yaml from 'js-yaml';
+import { exec } from 'shelljs';
+import * as util from 'util';
 
 const writeFile = util.promisify(fs.writeFile);
 

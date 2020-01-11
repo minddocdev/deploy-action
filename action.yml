@@ -1,44 +1,44 @@
-name: 'Helm'
-description: 'Helm check and publish'
-author: 'MindDoc GmbH'
+name: "Deploy"
+description: "Deploys a helm chart to a Kubernetes cluster"
+author: "MindDoc Health GmbH"
+branding:
+  icon: "cloud"
+  color: "green"
 inputs:
   # Deployment variables
   config:
-    description: 'The deployment configuration in JSON or YAML format'
+    description: "The deployment configuration in JSON or YAML format"
     required: true
   # Helm variables
   helmRepoName:
-    description: 'The helm repository name where the chart belongs to'
+    description: "The helm repository name where the chart belongs to"
     required: false
   helmRepoUrl:
-    description: 'The helm repository url'
+    description: "The helm repository url"
     required: false
   helmRepoUsername:
-    description: 'The helm repository username'
+    description: "The helm repository username"
     required: false
   helmRepoPassword:
-    description: 'The helm repository password'
+    description: "The helm repository password"
     required: false
   kubeConfig:
-    description: 'The kubectl configuration'
+    description: "The kubectl configuration"
     required: false
   # Sentry variables
   sentryAuthToken:
-    description: 'The sentry client token for authentication'
+    description: "The sentry client token for authentication"
     required: false
   sentryEnvironment:
-    description: 'The sentry environment to deploy to'
+    description: "The sentry environment to deploy to"
     required: false
   sentryOrg:
-    description: 'The sentry organization'
+    description: "The sentry organization"
     required: false
   # Slack variables
   slackWebhook:
-    description: 'The slack webhook to use to push messages'
+    description: "The slack webhook to use to push messages"
     required: false
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-branding:
-  icon: 'cloud'
-  color: 'green'
+  using: "node12"
+  main: "lib/index.js"

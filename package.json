@@ -1,13 +1,13 @@
 {
   "name": "deploy-action",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Deploy action",
-  "main": "lib/main.js",
+  "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build -o lib",
     "lint": "tslint --project .",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
     "node",
     "setup"
   ],
-  "author": "MindDoc GmbH",
+  "author": "MindDoc Health GmbH",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
@@ -33,11 +33,18 @@
     "@types/js-yaml": "^3.12.1",
     "@types/node": "^12.12.14",
     "@types/shelljs": "^0.8.6",
+    "@zeit/ncc": "^0.21.0",
+    "husky": "^4.0.3",
     "jest": "^24.8.0",
     "jest-circus": "^24.7.1",
     "ts-jest": "^24.0.2",
     "tslint": "^5.20.1",
     "tslint-config-airbnb": "^5.11.2",
     "typescript": "^3.5.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn build"
+    }
   }
 }

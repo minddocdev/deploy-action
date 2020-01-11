@@ -1,5 +1,7 @@
 # Deploy Action
 
+Deploys a helm chart to a Kubernetes cluster.
+
 Install the dependencies
 
 ```bash
@@ -12,7 +14,7 @@ Build the typescript
 yarn build
 ```
 
-Run the tests :heavy_check_mark:
+Run the tests
 
 ```bash
 yarn test

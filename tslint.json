@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint-config-airbnb"
-  ],
+  "extends": ["tslint-config-airbnb"],
   "rules": {
     "import-name": false,
     "no-duplicate-variable": true,
