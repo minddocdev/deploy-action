@@ -76,8 +76,10 @@ export function setupHelmChart(
   release: string,
   chart: string,
   valueFiles: string[] = [],
+  chartVersion?: string,
 ) {
   core.startGroup(`Deploy ${chart} chart with release ${release}`);
+  const versionString = chartVersion ? `--version ${chartVersion}` : '';
   const valueFilesString = valueFiles
     .map(valueFile => `-f ${valueFile}`)
     .join(' ');
@@ -87,6 +89,7 @@ export function setupHelmChart(
       --wait
       --namespace ${namespace}
       ${valueFilesString}
+      ${versionString}
       ${release}
       ${chart}
   `;

@@ -16,12 +16,13 @@ interface RequiredConfig {
   chart: string;
 }
 interface OptionalConfig extends RequiredConfig {
+  chartVersion?: string;
   namespace?: string;
   release?: string;
   valueFiles?: string[];
   values?: {};
 }
-interface Config extends RequiredConfig {
+interface Config extends RequiredConfig, OptionalConfig {
   namespace: string;
   release: string;
   valueFiles: string[];
@@ -89,7 +90,7 @@ async function run() {
 
     // Deployment variables
     const config = getConfig();
-    const { app, appUrl, chart, namespace, release, valueFiles, values } = config;
+    const { app, appUrl, chart, chartVersion, namespace, release, valueFiles, values } = config;
     const environment = core.getInput('environment', { required: true });
 
     // Helm variables
@@ -141,7 +142,7 @@ async function run() {
       core.info('No repo was provided. Skipping repo addition');
     }
 
-    setupHelmChart(namespace, release, chart, valueFiles);
+    setupHelmChart(namespace, release, chart, valueFiles, chartVersion);
 
     // Deploy to Sentry
     if (sentryAuthToken) {

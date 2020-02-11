@@ -113,5 +113,13 @@ describe('helm', () => {
         -f values.yaml -f secrets.yaml ${release} ${chart}
       `);
     });
+
+    test('with chart version', () => {
+      setupHelmChart(namespace, release, chart, [], '1.0.0');
+      expect(sh.exec).toBeCalledWith(oneLine`
+        helm upgrade --install --wait --namespace ${namespace}
+        --version 1.0.0 ${release} ${chart}
+      `);
+    });
   });
 });
