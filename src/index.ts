@@ -18,12 +18,14 @@ interface RequiredConfig {
 interface OptionalConfig extends RequiredConfig {
   namespace?: string;
   release?: string;
+  sentryApp?: string;
   valueFiles?: string[];
   values?: {};
 }
 interface Config extends RequiredConfig {
   namespace: string;
   release: string;
+  sentryApp: string;
   valueFiles: string[];
   values: {};
 }
@@ -54,7 +56,7 @@ function getConfig(): Config {
       `);
     }
   });
-  ['namespace', 'release'].forEach((optionalKey) => {
+  ['namespace', 'sentryApp', 'release'].forEach((optionalKey) => {
     if (config[optionalKey] && typeof config[optionalKey] !== 'string') {
       throw new Error(oneLine`
         Expecting string in '${optionalKey}' optional key.
@@ -77,6 +79,7 @@ function getConfig(): Config {
   return {
     namespace: 'default',
     release: config.app,
+    sentryApp: config.sentryApp ?? config.app,
     valueFiles: [],
     values: {},
     ...config,
@@ -89,7 +92,7 @@ async function run() {
 
     // Deployment variables
     const config = getConfig();
-    const { app, appUrl, chart, namespace, release, valueFiles, values } = config;
+    const { app, appUrl, chart, namespace, sentryApp, release, valueFiles, values } = config;
     const environment = core.getInput('environment', { required: true });
 
     // Helm variables
@@ -116,6 +119,7 @@ async function run() {
     core.debug(`- release: ${release}`);
     core.debug(`- valueFiles: ${valueFiles}`);
     core.debug(`- values: ${values}`);
+    core.debug(`- sentryApp: ${sentryApp}`);
     core.debug(`- sentryAuthToken: ${sentryAuthToken}`);
     core.debug(`- sentryOrg: ${sentryOrg}`);
     core.debug(`- slackWebhook: ${slackWebhook}`);
@@ -145,7 +149,7 @@ async function run() {
 
     // Deploy to Sentry
     if (sentryAuthToken) {
-      setSentryRelease(sentryAuthToken, sentryOrg, app, context.sha, environment);
+      setSentryRelease(sentryAuthToken, sentryOrg, sentryApp, context.sha, environment);
     } else {
       core.info('No sentry auth token was provided. Skipping sentry release');
     }
